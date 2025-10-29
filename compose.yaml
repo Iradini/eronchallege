@@ -1,0 +1,33 @@
+name: eron-challenge
+
+services:
+  api:
+    build: .
+    image: eron-challenge:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      MOVIES_BASE_URL: ${MOVIES_BASE_URL:-https://wiremock.dev.eroninternational.com}
+      MOVIES_CONNECT_TIMEOUT_MS: ${MOVIES_CONNECT_TIMEOUT_MS:-2000}
+      MOVIES_RESPONSE_TIMEOUT_MS: ${MOVIES_RESPONSE_TIMEOUT_MS:-4000}
+      MOVIES_MAX_RETRIES: ${MOVIES_MAX_RETRIES:-2}
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus

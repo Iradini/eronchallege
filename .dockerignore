@@ -1,0 +1,18 @@
+# Build outputs
+target/
+
+# VCS/IDE
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+
+# OS files
+*.log
+*.swp
+*.DS_Store
+
+# Others
+node_modules/
+

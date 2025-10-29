@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+movies:
+  # Se puede sobreescribir con env MOVIES_BASE_URL
+  base-url: ${MOVIES_BASE_URL:https://wiremock.dev.eroninternational.com}
+  connect-timeout-ms: ${MOVIES_CONNECT_TIMEOUT_MS:2000}
+  response-timeout-ms: ${MOVIES_RESPONSE_TIMEOUT_MS:4000}
+  max-retries: ${MOVIES_MAX_RETRIES:2}
+
+logging:
+  level:
+    root: INFO
+    com.eron.challenge: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: eron-challenge
