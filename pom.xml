@@ -36,7 +36,7 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-		<!-- Exportar métricas en formato Prometheus -->
+		<!-- Export métrics in Prometheus format -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
