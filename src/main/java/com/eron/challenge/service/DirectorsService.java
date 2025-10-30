@@ -1,5 +1,6 @@
 package com.eron.challenge.service;
 
+import com.eron.challenge.client.MoviesClient;
 import org.springframework.stereotype.Service;
 import reactor.util.function.Tuples;
 
