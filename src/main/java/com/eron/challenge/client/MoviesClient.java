@@ -1,5 +1,8 @@
 package com.eron.challenge.client;
 
+import com.eron.challenge.config.MoviesProperties;
+import com.eron.challenge.model.external.ApiMoviesPageResponse;
+import com.eron.challenge.model.external.Movie;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,7 +23,7 @@ public class MoviesClient {
 
     public MoviesClient(WebClient webClient, MoviesProperties props) {
         this.webClient = webClient;
-        this,props = props;
+        this.props = props;
     }
 
     public Mono<ApiMoviesPageResponse> fetchPage(int page) {
@@ -39,16 +42,16 @@ public class MoviesClient {
     public Flux<Movie> fetchAllMovies() {
         return fetchPage(1)
                 .flatMapMany(firstPage -> {
-                    int totalPages = Math.max(1, firstPage,totalPages());
+                    int totalPages = Math.max(1, firstPage.totalPages());
                     return Flux
                             .range(1, totalPages)
                             .flatMap(this::fetchPage, 4)
-                            .flatMapIterable(ApiMoviesPageResponses::data);
+                            .flatMapIterable(ApiMoviesPageResponse::data);
                 });
     }
 
     private Retry retrySpec() {
-        int maxAttempts = Math.max(0, props.getMaxRetris());
+        int maxAttempts = Math.max(0, props.getMaxRetries());
         return Retry
                 .backoff(maxAttempts, Duration.ofMillis(300))
                 .filter(transientError())

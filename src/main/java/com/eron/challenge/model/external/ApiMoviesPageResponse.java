@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record ApiMoviesResponse(
+public record ApiMoviesPageResponse(
         int page,
         @JsonProperty("per_page") int perPage,
         int total,

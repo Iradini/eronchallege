@@ -1,7 +1,10 @@
 package com.eron.challenge.service;
 
 import com.eron.challenge.client.MoviesClient;
+import com.eron.challenge.model.api.DirectorsResponse;
+import com.eron.challenge.model.external.Movie;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.util.function.Function;

@@ -1,5 +1,7 @@
 package com.eron.challenge.controller;
 
+import com.eron.challenge.model.api.DirectorsResponse;
+import com.eron.challenge.service.DirectorsService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
