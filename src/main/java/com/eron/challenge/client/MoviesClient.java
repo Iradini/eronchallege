@@ -3,6 +3,7 @@ package com.eron.challenge.client;
 import com.eron.challenge.config.MoviesProperties;
 import com.eron.challenge.model.external.ApiMoviesPageResponse;
 import com.eron.challenge.model.external.Movie;
+import io.netty.handler.timeout.ReadTimeoutException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +14,7 @@ import reactor.util.retry.Retry;
 
 import java.net.ConnectException;
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 @Component
@@ -61,6 +63,8 @@ public class MoviesClient {
     private Predicate<Throwable> transientError() {
         return ex -> {
             if (ex instanceof ConnectException) return true;
+            if (ex instanceof TimeoutException) return true;
+            if (ex instanceof ReadTimeoutException) return true;
             if (ex instanceof WebClientResponseException wcre) {
                 return wcre.getStatusCode().is5xxServerError();
             }
