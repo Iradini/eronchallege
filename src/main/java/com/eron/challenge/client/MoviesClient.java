@@ -7,6 +7,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,10 +46,15 @@ public class MoviesClient {
         return fetchPage(1)
                 .flatMapMany(firstPage -> {
                     int totalPages = Math.max(1, firstPage.totalPages());
-                    return Flux
-                            .range(1, totalPages)
+                    Flux<Movie> firstData = Flux.fromIterable(firstPage.data());
+                    if (totalPages == 1) return firstData;
+
+                    int remainingCount = totalPages - 1;
+                    Flux<Movie> rest = Flux
+                            .range(2, remainingCount)
                             .flatMap(this::fetchPage, 4)
                             .flatMapIterable(ApiMoviesPageResponse::data);
+                    return Flux.concat(firstData, rest);
                 });
     }
 
@@ -65,6 +71,7 @@ public class MoviesClient {
             if (ex instanceof ConnectException) return true;
             if (ex instanceof TimeoutException) return true;
             if (ex instanceof ReadTimeoutException) return true;
+            if (ex instanceof WebClientRequestException) return true;
             if (ex instanceof WebClientResponseException wcre) {
                 return wcre.getStatusCode().is5xxServerError();
             }

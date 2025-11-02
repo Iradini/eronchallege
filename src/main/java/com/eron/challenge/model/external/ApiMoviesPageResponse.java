@@ -8,7 +8,7 @@ public record ApiMoviesPageResponse(
         int page,
         @JsonProperty("per_page") int perPage,
         int total,
-        @JsonProperty("total_page")
+        @JsonProperty("total_pages")
         int totalPages,
         List<Movie> data
 ) {}
