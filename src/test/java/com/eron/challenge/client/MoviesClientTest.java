@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -69,16 +70,17 @@ public class MoviesClientTest {
     }
 
     @Test
-    public void testFechPageRetriesOnServerError() throws JsonProcessingException {
+    public void testFetchPagePropagatesServerError() throws JsonProcessingException {
         server.enqueue(json500(Map.of("error","boom")));
-        server.enqueue(json200(new ApiMoviesPageResponse(1, 10, 1, 1, List.of(
-                new Movie("M1", "2020", "PG", "2010-10-10", "90 min", "Drama", "A", "W", "C")
-        ))));
         StepVerifier.create(client.fetchPage(1))
-                .expectNextMatches(p -> p.totalPages() == 1 && p.data().size() == 1)
-                .verifyComplete();
+                .expectErrorSatisfies(ex -> {
+                    assertThat(ex).isInstanceOf(WebClientResponseException.class);
+                    var wcre = (WebClientResponseException)ex;
+                    assertThat(wcre.getStatusCode().value()).isEqualTo(500);
+                })
+                .verify();
 
-        assertThat(server.getRequestCount()).isEqualTo(2);
+        assertThat(server.getRequestCount()).isEqualTo(1);
     }
 
     private MockResponse json200(Object body) throws JsonProcessingException {

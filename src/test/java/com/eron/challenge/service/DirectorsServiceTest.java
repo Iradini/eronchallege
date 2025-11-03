@@ -2,6 +2,7 @@ package com.eron.challenge.service;
 
 import com.eron.challenge.client.MoviesClient;
 import com.eron.challenge.model.external.Movie;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,15 +13,17 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 
-public class DirectorsServerTest {
+public class DirectorsServiceTest {
 
     private MoviesClient moviesClient;
     private DirectorsService service;
+    private SimpleMeterRegistry meterRegistry;
 
     @BeforeEach
     void setUp() {
         moviesClient = Mockito.mock(MoviesClient.class);
-        service = new DirectorsService(moviesClient);
+        meterRegistry = new SimpleMeterRegistry();
+        service = new DirectorsService(moviesClient, meterRegistry);
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.eron.challenge.client;
 import com.eron.challenge.config.MoviesProperties;
 import com.eron.challenge.model.external.ApiMoviesPageResponse;
 import com.eron.challenge.model.external.Movie;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -11,10 +13,8 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.net.ConnectException;
-import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
@@ -29,6 +29,8 @@ public class MoviesClient {
         this.props = props;
     }
 
+    @CircuitBreaker(name="movies")
+    @Retry(name="movies")
     public Mono<ApiMoviesPageResponse> fetchPage(int page) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -38,8 +40,7 @@ public class MoviesClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, resp ->
                         resp.createException().flatMap(Mono::error))
-                .bodyToMono(ApiMoviesPageResponse.class)
-                .retryWhen(retrySpec());
+                .bodyToMono(ApiMoviesPageResponse.class);
     }
 
     public Flux<Movie> fetchAllMovies() {
@@ -56,14 +57,6 @@ public class MoviesClient {
                             .flatMapIterable(ApiMoviesPageResponse::data);
                     return Flux.concat(firstData, rest);
                 });
-    }
-
-    private Retry retrySpec() {
-        int maxAttempts = Math.max(0, props.getMaxRetries());
-        return Retry
-                .backoff(maxAttempts, Duration.ofMillis(300))
-                .filter(transientError())
-                .maxBackoff(Duration.ofSeconds(2));
     }
 
     private Predicate<Throwable> transientError() {

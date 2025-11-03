@@ -2,6 +2,7 @@ package com.eron.challenge.controller;
 
 import com.eron.challenge.model.api.DirectorsResponse;
 import com.eron.challenge.service.DirectorsService;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -27,6 +28,8 @@ public class DirectorsControllerTest {
 
     @MockitoBean
     private DirectorsService directorsService;
+    @MockitoBean
+    private MeterRegistry meterRegistry;
 
     @Test
     public void testReturnsDirectorsForValidThreshold() {

@@ -1,4 +1,14 @@
-Eron Back-End Developer Challenge (Reactive)
+# **Eron Back-End Developer Challenge**
+
+In this challenge, the REST API contains information about a collection of movie released after the year 2010, 
+directed by acclaimed directors. Given the threshold value, the goal is to use the API to get the list of the names of the directors with
+most movies directed. Specially, the list of names of directors with movie count strictly greater than the given threshold.
+
+The list of names must be returned in alphabetical order.
+
+Decisions Taken
+As the challenge required an aggregation on an external API with no DB
+
 
 Resumen
 - Microservicio Spring Boot (WebFlux) que consulta el API de películas paginado y expone `GET /api/directors?threshold=X` devolviendo directores con más películas que X, ordenados alfabéticamente.

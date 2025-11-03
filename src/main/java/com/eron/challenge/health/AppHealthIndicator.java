@@ -10,7 +10,7 @@ public class AppHealthIndicator implements ReactiveHealthIndicator {
 
   @Override
   public Mono<Health> health() {
-    // Indicador básico; aquí podrías integrar una verificación externa (e.g., Movies API) si aplica
+    // Basic indicator
     return Mono.just(Health.up().withDetail("app", "ready").build());
   }
 }
